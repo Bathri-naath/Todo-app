@@ -29,7 +29,7 @@ const Create = ({ fetchTodos }) => {
 
       <button
         onClick={handleAdd}
-        className="bg-black text-white px-5 py-2 rounded-md"
+        className="cursor-pointer bg-black text-white px-5 py-2 rounded-md"
       >
         Add
       </button>
