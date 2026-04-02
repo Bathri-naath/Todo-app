@@ -7,73 +7,81 @@ import { BsCircleFill, BsCheckCircleFill, BsTrash } from 'react-icons/bs'
 const Home = () => {
   const [todos, setTodos] = useState([])
 
-  const fetchTodos = () => {
-    axios.get(`${API}/get`)
-      .then(result => setTodos(result.data))
-      .catch(err => console.log(err))
+  const fetchTodos = async () => {
+    try {
+      const result = await axios.get(`${API}/get`)
+      setTodos(result.data)
+    } catch (err) {
+      console.log(err)
+    }
   }
 
   useEffect(() => {
     fetchTodos()
   }, [])
 
-  const handleEdit = (id) => {
-    axios.put(`${API}/update?id=${id}`)
-      .then(() => {
-        fetchTodos()
-      })
-      .catch(err => console.log(err))
+  const handleEdit = async (id) => {
+    try {
+      await axios.put(`${API}/update?id=${id}`)
+      fetchTodos()
+    } catch (err) {
+      console.log(err)
+    }
   }
 
-  const handleDelete = (id) => {
-    axios.delete(`${API}/delete?id=${id}`)
-      .then(() => {
-        fetchTodos()
-      })
-      .catch(err => console.log(err))
+  const handleDelete = async (id) => {
+    try {
+      await axios.delete(`${API}/delete?id=${id}`)
+      fetchTodos()
+    } catch (err) {
+      console.log(err)
+    }
   }
 
   return (
-    <div>
-      <h2 className='py-9 flex justify-center font-bold text-2xl'>
+    <div className="min-h-screen bg-gray-100 px-4 py-8">
+      <h2 className="py-6 flex justify-center font-bold text-3xl">
         Reminders
       </h2>
 
       <Create fetchTodos={fetchTodos} />
 
       {todos.length === 0 ? (
-        <div className='flex justify-center'>
-          <h2>Nothing to do!</h2>
+        <div className="flex justify-center mt-8">
+          <h2 className="text-gray-600 text-lg">Nothing to do!</h2>
         </div>
       ) : (
-        todos.map(todo => (
-          <div key={todo._id} className='flex justify-center items-center mb-3'>
-            <div className='w-auto flex justify-center gap-5 bg-black text-white rounded px-4 py-3'>
-              <div className='flex gap-5 items-center'>
+        <div className="flex flex-col items-center gap-4 mt-8">
+          {todos.map((todo) => (
+            <div
+              key={todo._id}
+              className="w-full max-w-md bg-black text-white rounded-lg shadow-md px-5 py-4 flex items-center justify-between"
+            >
+              <div className="flex items-center gap-4">
                 {todo.done ? (
                   <BsCheckCircleFill
-                    className='cursor-pointer'
+                    className="cursor-pointer text-xl"
                     onClick={() => handleEdit(todo._id)}
                   />
                 ) : (
                   <BsCircleFill
-                    className='cursor-pointer'
+                    className="cursor-pointer text-xl"
                     onClick={() => handleEdit(todo._id)}
                   />
                 )}
 
-                <p className={todo.done ? "line-through" : ""}>
+                <p className={todo.done ? 'line-through text-gray-400' : ''}>
                   {todo.task}
                 </p>
-
-                <BsTrash
-                  className='cursor-pointer'
-                  onClick={() => handleDelete(todo._id)}
-                />
               </div>
+
+              <BsTrash
+                className="cursor-pointer text-xl"
+                onClick={() => handleDelete(todo._id)}
+              />
             </div>
-          </div>
-        ))
+          ))}
+        </div>
       )}
     </div>
   )
