@@ -7,7 +7,7 @@ const Create = () => {
   const handleAdd = () => {
     if (!task.trim()) return
 
-    axios.post('${API}/add', {task})
+    axios.post(`${API}/add`, {task})
     .then(() => {
       setTask('')
       fetchTodos()

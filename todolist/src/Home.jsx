@@ -8,7 +8,7 @@ import { BsCircleFill, BsCheckCircleFill, BsTrash } from 'react-icons/bs'
 const Home = () => {
     const [todos, setTodos] = useState([])
     const fetchTodos = () => {
-        axios.get('${API}/get')
+        axios.get(`${API}/get`)
         .then(result => setTodos (result.data))
         .catch(err => console.log(err))
     }
@@ -16,14 +16,14 @@ const Home = () => {
         fetchTodos()
     }, [])
     const handleEdit = (id) => {
-        axios.put('${API}/update/${id}')
+        axios.put(`${API}/update/${id}`)
         .then(() => {
             fetchTodos()
         })
         .catch(err => console.log(err))
     }
     const handleDelete = (id) => {
-        axios.delete('${API}/delete/${id}')
+        axios.delete(`${API}/delete/${id}`)
         .then(() => {
             fetchTodos()
         })
