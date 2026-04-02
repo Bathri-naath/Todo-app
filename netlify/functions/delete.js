@@ -7,17 +7,11 @@ exports.handler = async (event) => {
 
     const id = event.queryStringParameters.id
 
-    const todo = await TodoModel.findById(id)
-
-    const updatedTodo = await TodoModel.findByIdAndUpdate(
-      id,
-      { done: !todo.done },
-      { new: true }
-    )
+    const deletedTodo = await TodoModel.findByIdAndDelete(id)
 
     return {
       statusCode: 200,
-      body: JSON.stringify(updatedTodo)
+      body: JSON.stringify(deletedTodo)
     }
   } catch (err) {
     return {
