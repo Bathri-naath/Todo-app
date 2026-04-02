@@ -1,11 +1,17 @@
 import React, { useState } from 'react'
 import axios from 'axios'
+import API from './api'
 
 const Create = () => {
-  const [task, setTask] = useState()
+  const [task, setTask] = useState('')
   const handleAdd = () => {
-    axios.post('http://localhost:3001/add', {task: task})
-    .then(result => {location.reload()})
+    if (!task.trim()) return
+
+    axios.post('${API}/add', {task})
+    .then(() => {
+      setTask('')
+      fetchTodos()
+    })
     .catch(err => console.log(err))
   }
   return (

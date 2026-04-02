@@ -1,31 +1,39 @@
 import React, { useState } from 'react'
 import axios from 'axios'
 import Create from './Create'
+import API from './api'
 import { useEffect } from 'react'
 import { BsCircleFill, BsCheckCircleFill, BsTrash } from 'react-icons/bs'
 
 const Home = () => {
     const [todos, setTodos] = useState([])
-    useEffect(() => {
-        axios.get('http://localhost:3001/get')
-        .then(result => setTodos(result.data))
+    const fetchTodos = () => {
+        axios.get('${API}/get')
+        .then(result => setTodos (result.data))
         .catch(err => console.log(err))
+    }
+    useEffect(() => {
+        fetchTodos()
     }, [])
     const handleEdit = (id) => {
-        axios.put('http://localhost:3001/update/'+id)
-        .then(result => {location.reload()})
+        axios.put('${API}/update/${id}')
+        .then(() => {
+            fetchTodos()
+        })
         .catch(err => console.log(err))
     }
     const handleDelete = (id) => {
-        axios.delete('http://localhost:3001/delete/'+id)
-        .then(result => {location.reload()})
+        axios.delete('${API}/delete/${id}')
+        .then(() => {
+            fetchTodos()
+        })
         .catch(err => console.log(err))
     }
 
   return (
     <div>
         <h2 className='py-9 flex justify-center font-bold'>Reminders</h2>
-        <Create />
+        <Create fetchTodos={fetchTodos} />
         {
             todos.length === 0
             ?
