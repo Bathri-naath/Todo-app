@@ -17,27 +17,37 @@ const Home = () => {
   const [editingId, setEditingId] = useState(null)
   const [editedTask, setEditedTask] = useState('')
 
-  const fetchTodos = async () => {
+  // ✅ Fetch todos (only show loader on first load)
+  const fetchTodos = async (showLoader = false) => {
     try {
-      setLoading(true)
+      if (showLoader) setLoading(true)
+
       const result = await axios.get(`${API}/get`)
       setTodos(result.data)
     } catch (err) {
       console.log(err)
     } finally {
-      setLoading(false)
+      if (showLoader) setLoading(false)
     }
   }
 
   useEffect(() => {
-    fetchTodos()
+    fetchTodos(true)
   }, [])
 
+  // ✅ Toggle done (optimistic UI)
   const handleEditToggle = async (id) => {
     try {
       setActionLoadingId(id)
+
+      // instant UI update
+      setTodos(prev =>
+        prev.map(todo =>
+          todo._id === id ? { ...todo, done: !todo.done } : todo
+        )
+      )
+
       await axios.put(`${API}/update?id=${id}`)
-      fetchTodos()
     } catch (err) {
       console.log(err)
     } finally {
@@ -45,11 +55,15 @@ const Home = () => {
     }
   }
 
+  // ✅ Delete
   const handleDelete = async (id) => {
     try {
       setActionLoadingId(id)
+
       await axios.delete(`${API}/delete?id=${id}`)
-      fetchTodos()
+
+      // remove from UI instantly
+      setTodos(prev => prev.filter(todo => todo._id !== id))
     } catch (err) {
       console.log(err)
     } finally {
@@ -57,15 +71,24 @@ const Home = () => {
     }
   }
 
+  // ✅ Save edited task
   const handleUpdateTask = async (id) => {
     try {
       setActionLoadingId(id)
+
       await axios.put(`${API}/edit?id=${id}`, {
         task: editedTask
       })
+
+      // update UI instantly
+      setTodos(prev =>
+        prev.map(todo =>
+          todo._id === id ? { ...todo, task: editedTask } : todo
+        )
+      )
+
       setEditingId(null)
       setEditedTask('')
-      fetchTodos()
     } catch (err) {
       console.log(err)
     } finally {
@@ -87,8 +110,9 @@ const Home = () => {
         Reminders
       </h2>
 
-      <Create fetchTodos={fetchTodos} />
+      <Create fetchTodos={() => fetchTodos(false)} />
 
+      {/* ✅ Initial loading only */}
       {loading ? (
         <div className="flex justify-center mt-10">
           <p className="text-gray-600 text-lg animate-pulse">
@@ -110,20 +134,23 @@ const Home = () => {
                 className="w-full max-w-md bg-black text-white rounded-lg shadow-md px-5 py-4 flex items-center justify-between"
               >
                 <div className="flex items-center gap-4 w-full">
-                  {isLoading ? (
-  <div className="w-5 h-5 border-2 border-white border-t-transparent rounded-full animate-spin"></div>
-) : todo.done ? (
-  <BsCheckCircleFill
-    className="cursor-pointer text-xl"
-    onClick={() => handleEditToggle(todo._id)}
-  />
-) : (
-  <BsCircleFill
-    className="cursor-pointer text-xl"
-    onClick={() => handleEditToggle(todo._id)}
-  />
-)}
 
+                  {/* ✅ Checkbox with spinner */}
+                  {isLoading ? (
+                    <div className="w-5 h-5 border-2 border-white border-t-transparent rounded-full animate-spin"></div>
+                  ) : todo.done ? (
+                    <BsCheckCircleFill
+                      className="cursor-pointer text-xl"
+                      onClick={() => handleEditToggle(todo._id)}
+                    />
+                  ) : (
+                    <BsCircleFill
+                      className="cursor-pointer text-xl"
+                      onClick={() => handleEditToggle(todo._id)}
+                    />
+                  )}
+
+                  {/* ✅ Edit input */}
                   {editingId === todo._id ? (
                     <input
                       type="text"
@@ -132,7 +159,7 @@ const Home = () => {
                       onKeyDown={(e) => handleKeyDown(e, todo._id)}
                       autoFocus
                       disabled={isLoading}
-                      className="bg-white text-black px-2 py-1 rounded w-full"
+                      className="text-black px-2 py-1 rounded w-full"
                     />
                   ) : (
                     <p
@@ -146,11 +173,12 @@ const Home = () => {
                 </div>
 
                 <div className="flex items-center gap-3 ml-4">
+                  {/* ✅ Save button */}
                   {editingId === todo._id ? (
                     <button
                       onClick={() => handleUpdateTask(todo._id)}
                       disabled={isLoading}
-                      className="text-sm bg-black px-2 py-1 rounded"
+                      className="text-sm bg-green-500 px-2 py-1 rounded"
                     >
                       {isLoading ? 'Saving...' : 'Save'}
                     </button>
@@ -168,6 +196,7 @@ const Home = () => {
                     />
                   )}
 
+                  {/* ✅ Delete */}
                   <BsTrash
                     className={`text-xl ${
                       isLoading ? 'opacity-50' : 'cursor-pointer'
