@@ -89,7 +89,6 @@ const Home = () => {
 
       <Create fetchTodos={fetchTodos} />
 
-      {/* ✅ Initial Loading */}
       {loading ? (
         <div className="flex justify-center mt-10">
           <p className="text-gray-600 text-lg animate-pulse">
@@ -111,25 +110,19 @@ const Home = () => {
                 className="w-full max-w-md bg-black text-white rounded-lg shadow-md px-5 py-4 flex items-center justify-between"
               >
                 <div className="flex items-center gap-4 w-full">
-                  {todo.done ? (
-                    <BsCheckCircleFill
-                      className={`text-xl ${
-                        isLoading ? 'opacity-50' : 'cursor-pointer'
-                      }`}
-                      onClick={() =>
-                        !isLoading && handleEditToggle(todo._id)
-                      }
-                    />
-                  ) : (
-                    <BsCircleFill
-                      className={`text-xl ${
-                        isLoading ? 'opacity-50' : 'cursor-pointer'
-                      }`}
-                      onClick={() =>
-                        !isLoading && handleEditToggle(todo._id)
-                      }
-                    />
-                  )}
+                  {isLoading ? (
+  <div className="w-5 h-5 border-2 border-white border-t-transparent rounded-full animate-spin"></div>
+) : todo.done ? (
+  <BsCheckCircleFill
+    className="cursor-pointer text-xl"
+    onClick={() => handleEditToggle(todo._id)}
+  />
+) : (
+  <BsCircleFill
+    className="cursor-pointer text-xl"
+    onClick={() => handleEditToggle(todo._id)}
+  />
+)}
 
                   {editingId === todo._id ? (
                     <input
