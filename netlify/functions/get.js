@@ -1,19 +1,16 @@
 const connectDB = require("./db")
 const TodoModel = require("./Todo")
+const { success, error, options } = require("./cors")
 
-exports.handler = async () => {
+exports.handler = async (event) => {
+  if (event.httpMethod === "OPTIONS") return options()
+
   try {
     await connectDB()
     const todos = await TodoModel.find()
 
-    return {
-      statusCode: 200,
-      body: JSON.stringify(todos)
-    }
+    return success(todos)
   } catch (err) {
-    return {
-      statusCode: 500,
-      body: JSON.stringify({ error: err.message })
-    }
+    return error(err)
   }
 }

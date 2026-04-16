@@ -9,13 +9,13 @@ exports.handler = async (event) => {
     await connectDB()
 
     const id = event.queryStringParameters?.id
-    if (!id) return badRequest("ID required")
+    const { task } = JSON.parse(event.body)
 
-    const todo = await TodoModel.findById(id)
+    if (!id || !task) return badRequest("ID and task required")
 
     const updatedTodo = await TodoModel.findByIdAndUpdate(
       id,
-      { done: !todo.done },
+      { task },
       { new: true }
     )
 

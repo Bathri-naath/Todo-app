@@ -17,8 +17,8 @@ app.get ('/get', (req, res) => {
     .catch(err => res.json(err))
 })
 
-app.put ('/update/:id', (req, res)=> {
-    const {id} = req.params;
+app.put ('/update', (req, res)=> {
+    const {id} = req.query;
     TodoModel.findById(id)
     .then(todo => {
         TodoModel.findByIdAndUpdate(id, {done: !todo.done})
@@ -28,8 +28,29 @@ app.put ('/update/:id', (req, res)=> {
     .catch(err => res.json(err))
 })
 
-app.delete ('/delete/:id', (req,res)=> {
-    const {id} = req.params;
+app.put('/edit', async (req, res) => {
+  try {
+    const { id } = req.query
+    const { task } = req.body
+
+    if (!id || !task) {
+      return res.status(400).json({ error: "ID and task required" })
+    }
+
+    const updatedTodo = await TodoModel.findByIdAndUpdate(
+      id,
+      { task },
+      { new: true }
+    )
+
+    res.json(updatedTodo)
+  } catch (err) {
+    res.status(500).json({ error: err.message })
+  }
+})
+
+app.delete ('/delete', (req,res)=> {
+    const {id} = req.query;
     TodoModel.findByIdAndDelete({_id: id})
     .then(result => res.json(result))
     .catch(err => res.json(err))

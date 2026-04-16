@@ -1,25 +1,23 @@
 const connectDB = require("./db")
 const TodoModel = require("./Todo")
+const { success, error, options, badRequest } = require("./cors")
 
 exports.handler = async (event) => {
+  if (event.httpMethod === "OPTIONS") return options()
+
   try {
     await connectDB()
 
     const { task } = JSON.parse(event.body)
+    if (!task) return badRequest("Task is required")
 
     const todo = await TodoModel.create({
       task,
       done: false
     })
 
-    return {
-      statusCode: 200,
-      body: JSON.stringify(todo)
-    }
+    return success(todo)
   } catch (err) {
-    return {
-      statusCode: 500,
-      body: JSON.stringify({ error: err.message })
-    }
+    return error(err)
   }
 }
